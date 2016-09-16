@@ -1,18 +1,18 @@
-[![Build Status](https://api.travis-ci.org/nickburns2006/rxDataTable.png)](https://travis-ci.org/nickburns2006/rxDataTable)
-[![Coverage Status](https://coveralls.io/repos/nickburns2006/rxDataTable/badge.png?branch=master)](https://coveralls.io/r/nickburns2006/rxDataTable?branch=master)
-[![Dependency Status](https://david-dm.org/nickburns2006/rxDataTable.png)](https://david-dm.org/nickburns2006/rxDataTable.png)
+[![Build Status](https://api.travis-ci.org/rackerlabs/rxDataTable.png)](https://travis-ci.org/rackerlabs/rxDataTable)
+[![Coverage Status](https://coveralls.io/repos/rackerlabs/rxDataTable/badge.png?branch=master)](https://coveralls.io/r/rackerlabs/rxDataTable?branch=master)
+[![Dependency Status](https://david-dm.org/rackerlabs/rxDataTable.png)](https://david-dm.org/rackerlabs/rxDataTable.png)
 Data Table Directive
 ==========================
- 
+
 ## Documentation & Live Demo
-**http://nickburns2006.github.io/rxDataTable/**
+**http://rackerlabs.github.io/rxDataTable/**
 
 ##Overview##
 The `rx-data-table` directive is designed to pretty much be a catch-all
 solution for displaying data in a table format in a basic or extremely
 complex style. It has some basic CSS styling included, but provides hooks
 for you to attach conditional styles to each row or column.
-   
+
 ###Some Key Features###
 - Single or Multi-Column Sorting
 - Column Display Presets
@@ -40,7 +40,7 @@ bower install angular-rx-data-table
 var app = angular.module("app", ["rxDataTable"]);
 ```
 5. For further instructions on how to use the directive, view the full
-   documentation [here](http://nickburns2006.github.io/rxDataTable).
+   documentation [here](http://rackerlabs.github.io/rxDataTable).
 
 ##Dependencies##
 
