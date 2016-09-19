@@ -24,7 +24,7 @@ module.exports = function(grunt) {
         cmpnt: grunt.file.readJSON('bower.json'),
         dist: 'dist',
         banner: '/*! rxDataTable v<%= cmpnt.version %> by Stephen Golub(stephen.golub@rackspace.com) - ' +
-                'https://github.com/nickburns2006/rxDataTable - New BSD License */\n',
+                'https://github.com/rackerlabs/rxDataTable - New BSD License */\n',
         clean: {
             working: {
                 src: ['src/scripts/rx-data-table.js', 'src/styles/rx-data-table.css']
