@@ -102,7 +102,7 @@
             <div class="prefix-container" ng-if="shouldHaveRowPrefix(row)" ng-bind-html="rowPrefix()(row)">
             </div>
         </div>
-        <div class="data-cell flex-columns-{{ column.cols }} data-column-{{ $index + 1}} {{ column.class }}" ng-repeat="column in getConfig()" data-title="{{ column.title }}" ng-class="getNGClass(column, row)" ng-mouseenter="cellMouseEnter($event)" ng-mouseleave="cellMouseLeave($event)">
+        <div class="data-cell flex-columns-{{ column.cols }} data-column-{{ $index + 1}} {{ column.class }}" ng-repeat="column in getConfig()" data-title="{{ column.title }}" ng-class="getNGClass(column, row)">
             <div ng-if="column.checkbox" class="checkbox">
                 <input type="checkbox" value="{{ row[column.dataField] }}" ng-click="clickAction('{{ row[column.dataField] }}')" id="checkbox_{{ row[column.dataField] }}">
             </div>
