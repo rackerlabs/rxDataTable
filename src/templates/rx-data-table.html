@@ -98,7 +98,7 @@
 
     </div>
     <div class="data-row data-row-{{ $index + 1}}" ng-repeat="row in listOfData() | rxDataTableSorting:predicate:pagerObject | Paginate:pagerObject track by row[rowKey]||$index" data-row-key="{{row[rowKey]}}" ng-class="rowClass(row)">
-        <div class="data-row-prefix" ng-if="showRowPrefix">
+        <div class="data-row-prefix" ng-if="rowPrefixClause === 'true'">
             <div class="prefix-container" ng-if="shouldHaveRowPrefix(row)" ng-bind-html="rowPrefix()(row)">
             </div>
         </div>
