@@ -1,6 +1,6 @@
 {
   "name": "tq-rx-data-table",
-  "version": "0.5.46",
+  "version": "0.5.47",
   "devDependencies": {
     "chai": "~1.7.2",
     "connect-livereload": "~0.3.2",
