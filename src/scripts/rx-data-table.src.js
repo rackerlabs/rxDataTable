@@ -408,10 +408,9 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
 
             scope.scoreTooltipTemplate = function (score) {
                 var template = [
-                    'Racker Actionable Since:', moment(score[2]).format('MMMM Do YYYY, h:mm:ss a'),
-                    '<br />Max Response Time of Tier:', score[3]
+                    'Racker Actionable Since:', moment(score[2]).format('MMMM Do YYYY, h:mm:ss a')
                 ];
-                return $sce.trustAsHtml(template.join());
+                return template.join(' ');
             };
 
             scope.iconUnwrap = function (column, row, type) {
