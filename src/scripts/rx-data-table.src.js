@@ -70,7 +70,7 @@ var app = angular.module('rxDataTable', []);
  * @param {array.<object>} column-configuration This are the available column definitions, see the
  *    extended information for this in the {@link #/guides/rx-data-table#column-object Data Table Guide}
  */
-app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $parse, $sce, PageTracking) {
+app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $parse, PageTracking) {
     return {
         restrict: 'E',
         replace: true,
@@ -408,7 +408,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
 
             scope.scoreTooltipTemplate = function (score) {
                 var template = [
-                    'Racker Actionable Since:', moment(score[2]).format('MMMM Do YYYY, h:mm:ss a')
+                    'Racker Actionable Since:', moment(score.lastResponseTime).format('MMMM Do YYYY, h:mm:ss a')
                 ];
                 return template.join(' ');
             };
