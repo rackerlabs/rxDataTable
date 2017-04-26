@@ -127,7 +127,7 @@
                 <a ng-if="!buildContent(row, column) && buildLink(row, column) && hasValue(row, column)" href="{{ buildLink(row, column) }}" class="data-cell-content" target="{{ (column.linkTarget) ? column.linkTarget : '_blank' }}">{{ row | ColumnValue:column }}</a>
                 <span ng-if="!buildContent(row, column) && !buildLink(row, column) && hasValue(row, column)" class="data-cell-content">
                     <span ng-if="!allowEditing(column,row) && column.dataField != 'score'">{{ row | ColumnValue:column:false }}</span>
-                    <span ng-if="!allowEditing(column,row) && column.dataField === 'score'" popover="{{scoreTooltipTemplate(row.score)}}" popover-title="{{'Max Response Time of Tier: ' + row.score.maxResponseTime + ' seconds'}}" popover-append-to-body="true" popover-placement="right" popover-trigger="mouseenter">{{ row | ColumnValue:column }}</span>
+                    <span ng-if="!allowEditing(column,row) && column.dataField === 'score'" popover="{{scoreTooltipTemplate(row.score)}}" popover-title="{{maxResponseCalculation(row.score)}}" popover-append-to-body="true" popover-placement="right" popover-trigger="mouseenter">{{ row | ColumnValue:column }}</span>
                     <span ng-if="allowEditing(column,row)" class="data-editable">
                         <span ng-switch="getEditType(column, row)">
                             <span ng-switch-when="select" class="data-editable-field" editable-select="row[column.dataField]" e-ng-options="o.value as o.text for o in getEditableOptions(column, row)" buttons="no" onbeforesave="updateField(column, row, $data, this)">{{ row | ColumnValue:column }}</span>

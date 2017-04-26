@@ -408,7 +408,14 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
 
             scope.scoreTooltipTemplate = function (score) {
                 var template = [
-                    'Racker Actionable Since:', moment(score.lastResponseTime).format('MMMM Do YYYY, h:mm:ss a')
+                    'Waiting on Racker for ', $filter('rxAge')(score.lastResponseTime, 3, true)
+                ];
+                return template.join(' ');
+            };
+
+            scope.maxResponseCalculation = function (score) {
+                var template = [
+                    score.type, 'for ticket is ', $filter('rxAge')(score.maxResponseTime, 2, true)
                 ];
                 return template.join(' ');
             };
