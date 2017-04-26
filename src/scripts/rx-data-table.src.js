@@ -406,6 +406,13 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                 }, errorDisplayTimeout);
             });
 
+            scope.scoreTooltipTemplate = function (score) {
+                var template = [
+                    'Racker Actionable Since:', moment(score.lastResponseTime).format('MMMM Do YYYY, h:mm:ss a')
+                ];
+                return template.join(' ');
+            };
+
             scope.iconUnwrap = function (column, row, type) {
                 return _.filter(column.icon, function (icon) {
                     if (_.has(icon, 'fieldValue')) {
