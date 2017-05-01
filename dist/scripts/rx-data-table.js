@@ -415,7 +415,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
 
             scope.maxResponseCalculation = function (score) {
                 var template = [
-                    score.type, 'for ticket is ', $filter('rxAge')(score.maxResponseTime, 2, true)
+                    score.type, 'for ticket is ', $filter('rxAge')(moment().subtract(score.maxResponseTime, 'seconds'), 2, true)
                 ];
                 return template.join(' ');
             };
