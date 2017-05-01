@@ -1,6 +1,6 @@
 {
   "name": "tq-rx-data-table",
-  "version": "0.5.48",
+  "version": "0.5.49",
   "description": "A full-featured data table directive for angularJS",
   "main": "rx-data-table.js",
   "author": "Stephen Golub",
