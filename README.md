@@ -28,7 +28,7 @@ for you to attach conditional styles to each row or column.
 1. You must already have an angular project set up.
 2. Install via [bower](http://bower.io):
 ```
-bower install angular-rx-data-table
+bower install angular-rx-data-table 
 ```
 3. Include angular-rx-data-table in your code
 ```
