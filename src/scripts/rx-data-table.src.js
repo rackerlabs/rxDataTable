@@ -408,16 +408,27 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
 
             scope.scoreTooltipTemplate = function (row) {
                 var template = [
-                    'Waiting on Racker for ', $filter('rxAge')(row.score.lastResponseTime, 3, true)
-                ];
-                return template.join(' ');
-            };
-
-            scope.maxResponseCalculation = function (row) {
-                var template = [
                     row.account_tier || '', //jshint ignore:line
-                    row.score.type, 'for ticket is ',
-                    $filter('rxAge')(moment().subtract(row.score.maxResponseTime, 'seconds'), 2, true)
+                    row.score.type,
+                    ' for ticket is ',
+                    $filter('rxAge')(moment().subtract(row.score.maxResponseTime, 'seconds'), 2, true) + '.',
+                    '<br/>Waiting on Racker for ',
+                    $filter('rxAge')(row.score.lastResponseTime, 3, true) + '.',
+                    '<br/><br/>Score: ',
+                    row.score.weight,
+                    ' * ',
+                    row.score.priorityWeight,
+                    ' * ',
+                    row.score.severityWeight,
+                    ' * (',
+                    row.score.elapsedTime,
+                    '/',
+                    row.score.maxResponseTime,
+                    ') * (',
+                    row.score.elapsedTime,
+                    '/',
+                    row.score.slMaxResponseTime,
+                    ')'
                 ];
                 return template.join(' ');
             };
