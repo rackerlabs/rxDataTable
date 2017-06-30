@@ -7,13 +7,13 @@ Data Table Directive
 ## Documentation & Live Demo
 **http://rackerlabs.github.io/rxDataTable/**
 
-##Overview##
+## Overview
 The `rx-data-table` directive is designed to pretty much be a catch-all
 solution for displaying data in a table format in a basic or extremely
 complex style. It has some basic CSS styling included, but provides hooks
 for you to attach conditional styles to each row or column.
 
-###Some Key Features###
+### Some Key Features
 - Single or Multi-Column Sorting
 - Column Display Presets
 - Individual Data-Driven Cell Styling
@@ -23,7 +23,7 @@ for you to attach conditional styles to each row or column.
     - Multi-Option Selects
     - Typeahead auto-complete
 
-##Get started##
+## Get started
 
 1. You must already have an angular project set up.
 2. Install via [bower](http://bower.io):
@@ -42,7 +42,7 @@ var app = angular.module("app", ["rxDataTable"]);
 5. For further instructions on how to use the directive, view the full
    documentation [here](http://rackerlabs.github.io/rxDataTable).
 
-##Modifying rxDataTable##
+## Modifying rxDataTable
 
 To speed up development of rxDataTable changes, use [bower link](https://bower.io/docs/api/#link) to see your changes on the encore UI.
 
@@ -64,15 +64,15 @@ When you're done making your changes and wish to revert to the bower deployed ve
 bower uninstall tq-rx-data-table
 ```
 
-##Dependencies##
+## Dependencies
 
 Obviously this requires you to have an [angularjs](http://angularjs.org/)
 project to use this.
 
 This project uses the [angular-xeditable](http://vitalets.github.io/angular-xeditable/ "angular-xeditable homepage") for it's inline editing capabilities.
 
-##TODO##
+## TODO
 ...
-##License##
+## License
 
 [MIT](./LICENSE.md)
