@@ -42,6 +42,28 @@ var app = angular.module("app", ["rxDataTable"]);
 5. For further instructions on how to use the directive, view the full
    documentation [here](http://rackerlabs.github.io/rxDataTable).
 
+##Modifying rxDataTable##
+
+To speed up development of rxDataTable changes, use [bower link](https://bower.io/docs/api/#link) to see your changes on the encore UI.
+
+To get this working, you'll need to run bower link in rxDataTable and set up grunt to refresh on changes:
+```
+bower link
+grunt watch
+```
+
+After this, go to the encore UI project folder, and enter:
+```
+bower link tq-rx-data-table
+```
+
+After this, you should see your data table changes reflected on page refreshes.
+
+When you're done making your changes and wish to revert to the bower deployed version of rxDataTable, you can return to it by entering:
+```
+bower uninstall tq-rx-data-table
+```
+
 ##Dependencies##
 
 Obviously this requires you to have an [angularjs](http://angularjs.org/)
