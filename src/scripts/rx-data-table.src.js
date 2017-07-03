@@ -507,9 +507,9 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
             };
 
             scope.getConfig = function () {
-                return _.map(scope.getPresetConfiguration(), function (columnIndex) {
+                return _.compact(_.map(scope.getPresetConfiguration(), function (columnIndex) {
                     return _.find(scope.columnConfiguration, { id: columnIndex });
-                });
+                }));
             };
 
             scope.getColumnPresets = function () {
