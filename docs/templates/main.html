@@ -149,6 +149,16 @@ for you to attach conditional styles to each row or column.</p>
 <li>For further instructions on how to use the directive, view the full
 documentation <a href="http://rackerlabs.github.io/rxDataTable">here</a>.</li>
 </ol>
+<h2 id="modifying-rxdatatable">Modifying rxDataTable</h2>
+<p>To speed up development of rxDataTable changes, use <a href="https://bower.io/docs/api/#link">bower link</a> to see your changes on the encore UI.</p>
+<p>To get this working, you&#39;ll need to run bower link in rxDataTable and set up grunt to refresh on changes:</p>
+<pre><code>bower link
+grunt watch</code></pre>
+<p>After this, go to the encore UI project folder, and enter:</p>
+<pre><code>bower link tq-rx-data-table</code></pre>
+<p>After this, you should see your data table changes reflected on page refreshes.</p>
+<p>When you&#39;re done making your changes and wish to revert to the bower deployed version of rxDataTable, you can return to it by entering:</p>
+<pre><code>bower uninstall tq-rx-data-table</code></pre>
 <h2 id="dependencies">Dependencies</h2>
 <p>Obviously this requires you to have an <a href="http://angularjs.org/">angularjs</a>
 project to use this.</p>
