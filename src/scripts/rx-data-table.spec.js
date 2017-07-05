@@ -41,6 +41,7 @@ describe('Data Table Directive', function () {
 
             scope.dtConfig = [
                 {
+                    'id': 1,
                     'title': 'ID',
                     'dataField': 'ref_no',
                     'sortField': 'severity',
@@ -56,6 +57,7 @@ describe('Data Table Directive', function () {
                     }
                 },
                 {
+                    'id': 2,
                     'title': 'Subject',
                     'dataField': 'subject',
                     'sortField': 'subject',
@@ -71,6 +73,7 @@ describe('Data Table Directive', function () {
                     }
                 },
                 {
+                    'id': 3,
                     'title': 'Status',
                     'cols': '2',
                     'dataField': 'status',
@@ -135,6 +138,7 @@ describe('Data Table Directive', function () {
                     ]
                 },
                 {
+                    'id': 4,
                     'title': 'Assigned',
                     'cols': '2',
                     'dataField': 'assigned',
@@ -163,11 +167,13 @@ describe('Data Table Directive', function () {
                     },
                 },
                 {
+                    'id': 5,
                     'title': 'Assigned',
                     'cols': '3',
                     'dataField': 'assigned'
                 },
                 {
+                    'id': 6,
                     'title': 'Multi-Line Subject',
                     'cols': '4',
                     'dataField': ['ref_no', 'subject'],
@@ -181,17 +187,17 @@ describe('Data Table Directive', function () {
             scope.dtColumnPresets = [
                 {
                     'title': 'Default View',
-                    'config': [0,1,2,3,5]
+                    'config': [1,2,3,4,6]
                 },
                 {
                     'title': 'Non Editable Assignee',
-                    'config': [0,1,2,4]
+                    'config': [1,2,3,5]
                 }
             ];
 
             scope.dtColumnDisplay = {
                 'index': 0,
-                'config': [0,1,2,3,5]
+                'config': [1,2,3,4,6]
             };
 
 
@@ -800,24 +806,24 @@ describe('Data Table Directive', function () {
     });
 
     it('should shift a column down', function () {
-        expect(scope.dtColumnDisplay.config[0]).to.equal(0);
-        elScope.moveColumnDown(0);
+        expect(scope.dtColumnDisplay.config[0]).to.equal(1);
+        elScope.moveColumnDown(1);
         expect(scope.dtColumnDisplay.config[0]).to.equal(1);
     });
 
     it('should shift a column up', function () {
-        expect(scope.dtColumnDisplay.config[1]).to.equal(1);
+        expect(scope.dtColumnDisplay.config[1]).to.equal(2);
         elScope.moveColumnUp(1);
-        expect(scope.dtColumnDisplay.config[1]).to.equal(0);
+        expect(scope.dtColumnDisplay.config[1]).to.equal(1);
     });
 
     it('should not shift a column out of range', function () {
-        expect(scope.dtColumnDisplay.config[0]).to.equal(0);
-        expect(scope.dtColumnDisplay.config[4]).to.equal(5);
-        elScope.moveColumnUp(0);
+        expect(scope.dtColumnDisplay.config[0]).to.equal(1);
+        expect(scope.dtColumnDisplay.config[4]).to.equal(6);
+        elScope.moveColumnUp(1);
         elScope.moveColumnDown(4);
-        expect(scope.dtColumnDisplay.config[0]).to.equal(0);
-        expect(scope.dtColumnDisplay.config[4]).to.equal(5);
+        expect(scope.dtColumnDisplay.config[0]).to.equal(2);
+        expect(scope.dtColumnDisplay.config[4]).to.equal(6);
     });
 
     it('should remove a column from the display', function () {
@@ -828,7 +834,7 @@ describe('Data Table Directive', function () {
 
     it('should add a column to the display', function () {
         expect(scope.dtColumnDisplay.config.length).to.equal(5);
-        elScope.showColumn(4);
+        elScope.showColumn(5);
         expect(scope.dtColumnDisplay.config.length).to.equal(6);
     });
 
