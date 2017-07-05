@@ -115,13 +115,9 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                 scope.columnPresets = [
                     {
                         'title': 'Default View',
-                        'config': []
+                        'config': _.map(scope.columnConfiguration, 'id')
                     }
                 ];
-
-                _.forEach(scope.columnConfiguration, function (column, index) {
-                    this.columnPresets[0].config.push(index);
-                }, scope);
             }
 
             if (_.isUndefined(scope.columnDisplay)) {
