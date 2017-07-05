@@ -119,8 +119,8 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                     }
                 ];
 
-                _.forEach(scope.columnConfiguration, function (column, index) {
-                    this.columnPresets[0].config.push(index);
+                _.forEach(scope.columnConfiguration, function (column) {
+                    this.columnPresets[0].config.push(column.id);
                 }, scope);
             }
 
