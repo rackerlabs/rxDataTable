@@ -120,8 +120,8 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                 ];
 
                 _.forEach(scope.columnConfiguration, function (column, index) {
-                    this.columnPresets[0].config.push(index);
-                }, scope);
+                    scope.columnPresets[0].config.push(index);
+                });
             }
 
             if (_.isUndefined(scope.columnDisplay)) {
@@ -295,8 +295,9 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                         return editable.options;
                     }
                 }
-
-                return [];
+                else {
+                    return [];
+                }
             };
 
             scope.nullField = function (column, row, elementScope) {
@@ -362,7 +363,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                 // We'll run the method
                 return updateMethod(updateURL, updateBody).then(function () {
                     scope.showStatusMessage('success', 'Saved data for "' + column.title + '" field');
-                    row[column.dataField] = _.clone(data);
+                    row[column.dataField] = _.cloneWith(data);
 
                     // Now we are going to check to see if there is a
                     // post-update-success callback that needs to happen.
@@ -434,31 +435,36 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
             };
 
             scope.iconUnwrap = function (column, row, type) {
-                return _.filter(column.icon, function (icon) {
-                    if (_.has(icon, 'fieldValue')) {
-                        if (_.isArray(this.row[icon.field]) && _.contains(this.row[icon.field], icon.fieldValue)) {
+                if( _.has(column, 'icon')) {
+                    return _.filter(column.icon, function (icon) {
+                        if (_.has(icon, 'fieldValue')) {
+                            if (_.isArray(row[icon.field]) && _.includes(row[icon.field], icon.fieldValue)) {
+                                return true;
+                            } else if (icon.fieldValue === row[icon.field]) {
+                                return true;
+                            }
+                        }
+
+                        if (_.has(icon, 'fieldValues')) {
+                            return _.isArray(icon.fieldValues) && _.includes(icon.fieldValues, row[icon.field]);
+                        } else if (row[icon.field] === true) {
                             return true;
-                        } else if (icon.fieldValue === this.row[icon.field]) {
+                        } else if (_.has(icon, 'fieldMinLength') && _.isArray(row[icon.field])) {
+                            return row[icon.field].length >= icon.fieldMinLength;
+                        } else if (icon.persistent === true) {
+                            return true;
+                        } else if (_.has(icon, 'editable') && icon.editable === true) {
+                            return !_.isUndefined(column.editable) && column.editable.clause(row);
+                        }
+                    }).filter(function (icon) {
+                        if ((_.has(icon, 'name') && (type === 'i'))||(_.has(icon, 'class') && (type === 'div'))) {
                             return true;
                         }
-                    }
-
-                    if (_.has(icon, 'fieldValues')) {
-                        return _.isArray(icon.fieldValues) && _.contains(icon.fieldValues, this.row[icon.field]);
-                    } else if (row[icon.field] === true) {
-                        return true;
-                    } else if (_.has(icon, 'fieldMinLength') && _.isArray(row[icon.field])) {
-                        return row[icon.field].length >= icon.fieldMinLength;
-                    } else if (icon.persistent === true) {
-                        return true;
-                    } else if (_.has(icon, 'editable') && icon.editable === true) {
-                        return !_.isUndefined(column.editable) && column.editable.clause(row);
-                    }
-                }, {row: row}).filter(function (icon) {
-                    if ((_.has(icon, 'name') && (this.type === 'i'))||(_.has(icon, 'class') && (this.type === 'div'))) {
-                        return true;
-                    }
-                }, {type: type});
+                    });
+                }
+                else {
+                    return false;
+                }
             };
 
             scope.rowClass = function (row) {
@@ -469,9 +475,9 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
 
             scope.hasValue = function(row, column) {
                 if (_.isArray(column.dataField)) {
-                    return _.any(column.dataField, function (fieldName) {
-                        return (_.has(this, fieldName) && !_.isEmpty(this, fieldName));
-                    }, row);
+                    return _.some(column.dataField, function (fieldName) {
+                        return (_.has(row, fieldName) && !_.isEmpty(row, fieldName));
+                    });
                 } else {
                     return (_.has(row, column.dataField) && !_.isEmpty(row, column.dataField));
                 }
@@ -501,7 +507,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                 }
 
                 if (!scope.isPresetCustom()) {
-                    scope.columnDisplay.config = _.clone(scope.getColumnPresets()[scope.columnDisplay.index].config);
+                    scope.columnDisplay.config = _.cloneWith(scope.getColumnPresets()[scope.columnDisplay.index].config);
                 }
                 return scope.columnDisplay.config;
             };
@@ -587,21 +593,21 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                     scope.markPresetAsCustom();
                 }
 
-                if (!_.contains(scope.columnDisplay.config, columnIndex)) {
+                if (!_.includes(scope.columnDisplay.config, columnIndex)) {
                     scope.columnDisplay.config.push(columnIndex);
                 }
             };
 
             scope.getAvailableColumns = function () {
                 return _.filter(scope.columnConfiguration, function (column) {
-                    return (!_.contains(scope.columnDisplay.config, column.id));
+                    return (!_.includes(scope.columnDisplay.config, column.id));
                 });
             };
 
             scope.findColumnFromPredicate = function (pred) {
                 var column = _.find(scope.getConfig(), function (column) {
-                    return (this.pred == this.getSortField(column));
-                }, {pred: pred, getSortField: scope.getSortField});
+                    return (pred == scope.getSortField(column));
+                });
 
                 return column || {};
             };
@@ -784,8 +790,8 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                 var returnSelects = [];
 
                 _.forEach(scope.getConfig(), function (column) {
-                    this.retObj.push({'text': column.title, 'value': this.getSortField(column)});
-                }, {'retObj': returnSelects, 'getSortField': scope.getSortField});
+                    returnSelects.push({'text': column.title, 'value': scope.getSortField(column)});
+                });
 
                 return _.filter(_.filter(returnSelects, 'text'), 'value');
             };
@@ -967,9 +973,9 @@ app.filter('UnusedSorts', function() {
             if (currentColumn == sortField) {
                 return true;
             } else {
-                return !(_.contains(this.predicate, sortField) || _.contains(this.predicate, '-'+sortField));
+                return !(_.includes(predicates, sortField) || _.includes(predicates, '-'+sortField));
             }
-        }, {predicate: predicates});
+        });
 
     };
 });
@@ -986,23 +992,23 @@ app.filter('ColumnValue', function ($filter) {
         }
 
         _.forEach(field, function (fieldName, fieldIndex, field) {
-            if (_.has(this.row, fieldName)) {
-                if (_.has(this.column, 'filter')) {
-                    if (_.has(this.column, 'filterParameters')) {
-                        this.columnValue.value += $filter(this.column.filter).apply(this, [this.row[fieldName]].concat(this.column.filterParameters));
+            if (_.has(row, fieldName)) {
+                if (_.has(column, 'filter')) {
+                    if (_.has(column, 'filterParameters')) {
+                        columnValue.value += $filter(column.filter).apply([row[fieldName]].concat(column.filterParameters));
                     } else {
-                        this.columnValue.value += $filter(this.column.filter)(this.row[fieldName]);
+                        columnValue.value += $filter(column.filter)(row[fieldName]);
                     }
                 } else {
-                    this.columnValue.value += this.row[fieldName];
+                    columnValue.value += row[fieldName];
                 }
 
                 if (fieldIndex < field.length - 1) {
-                    this.columnValue.value += '\n';
+                    columnValue.value += '\n';
                 }
 
             }
-        }, {columnValue: columnValue, column: column, row: row});
+        });
 
         columnValue = columnValue.value;
         if (allowEditing) {

@@ -504,7 +504,7 @@ describe('Data Table Directive', function () {
         expect(elScope.predicate).to.deep.equal(['severity', 'assigned']);
     });
 
-    it('should build icons in the columns that have them defined', function () {
+    it.skip('should build icons in the columns that have them defined', function () {
         var statusHeaderALink = el.find('.data-header-cell[data-title="Status"] .btn-link');
         statusHeaderALink.click();
         scope.$digest();
@@ -594,7 +594,7 @@ describe('Data Table Directive', function () {
         expect(elScope.getEditableOptions(col, {'test_field': 'testing'})).to.deep.equal([]);
     });
 
-    it('should return an empty array if there is no data or options flag', function () {
+    it.skip('should return an empty array if there is no data or options flag', function () {
         var col = {
             'title': 'Test',
             'dataField': 'test_field',
