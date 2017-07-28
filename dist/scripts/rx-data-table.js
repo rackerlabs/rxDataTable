@@ -295,9 +295,8 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                         return editable.options;
                     }
                 }
-                else {
-                    return [];
-                }
+
+                return [];
             };
 
             scope.nullField = function (column, row, elementScope) {
@@ -363,7 +362,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                 // We'll run the method
                 return updateMethod(updateURL, updateBody).then(function () {
                     scope.showStatusMessage('success', 'Saved data for "' + column.title + '" field');
-                    row[column.dataField] = _.cloneWith(data);
+                    row[column.dataField] = _.clone(data);
 
                     // Now we are going to check to see if there is a
                     // post-update-success callback that needs to happen.
@@ -507,7 +506,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                 }
 
                 if (!scope.isPresetCustom()) {
-                    scope.columnDisplay.config = _.cloneWith(scope.getColumnPresets()[scope.columnDisplay.index].config);
+                    scope.columnDisplay.config = _.clone(scope.getColumnPresets()[scope.columnDisplay.index].config);
                 }
                 return scope.columnDisplay.config;
             };
