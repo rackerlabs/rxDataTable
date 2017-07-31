@@ -460,8 +460,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                             return true;
                         }
                     });
-                }
-                else {
+                } else {
                     return false;
                 }
             };
