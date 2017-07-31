@@ -120,8 +120,8 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                 ];
 
                 _.forEach(scope.columnConfiguration, function (column, index) {
-                    this.columnPresets[0].config.push(index);
-                }, scope);
+                    scope.columnPresets[0].config.push(index);
+                });
             }
 
             if (_.isUndefined(scope.columnDisplay)) {
@@ -434,31 +434,36 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
             };
 
             scope.iconUnwrap = function (column, row, type) {
-                return _.filter(column.icon, function (icon) {
-                    if (_.has(icon, 'fieldValue')) {
-                        if (_.isArray(this.row[icon.field]) && _.contains(this.row[icon.field], icon.fieldValue)) {
+                if( _.has(column, 'icon')) {
+                    return _.filter(column.icon, function (icon) {
+                        if (_.has(icon, 'fieldValue')) {
+                            if (_.isArray(row[icon.field]) && _.includes(row[icon.field], icon.fieldValue)) {
+                                return true;
+                            } else if (icon.fieldValue === row[icon.field]) {
+                                return true;
+                            }
+                        }
+
+                        if (_.has(icon, 'fieldValues')) {
+                            return _.isArray(icon.fieldValues) && _.includes(icon.fieldValues, row[icon.field]);
+                        } else if (row[icon.field] === true) {
                             return true;
-                        } else if (icon.fieldValue === this.row[icon.field]) {
+                        } else if (_.has(icon, 'fieldMinLength') && _.isArray(row[icon.field])) {
+                            return row[icon.field].length >= icon.fieldMinLength;
+                        } else if (icon.persistent === true) {
+                            return true;
+                        } else if (_.has(icon, 'editable') && icon.editable === true) {
+                            return !_.isUndefined(column.editable) && column.editable.clause(row);
+                        }
+                    }).filter(function (icon) {
+                        if ((_.has(icon, 'name') && (type === 'i'))||(_.has(icon, 'class') && (type === 'div'))) {
                             return true;
                         }
-                    }
-
-                    if (_.has(icon, 'fieldValues')) {
-                        return _.isArray(icon.fieldValues) && _.contains(icon.fieldValues, this.row[icon.field]);
-                    } else if (row[icon.field] === true) {
-                        return true;
-                    } else if (_.has(icon, 'fieldMinLength') && _.isArray(row[icon.field])) {
-                        return row[icon.field].length >= icon.fieldMinLength;
-                    } else if (icon.persistent === true) {
-                        return true;
-                    } else if (_.has(icon, 'editable') && icon.editable === true) {
-                        return !_.isUndefined(column.editable) && column.editable.clause(row);
-                    }
-                }, {row: row}).filter(function (icon) {
-                    if ((_.has(icon, 'name') && (this.type === 'i'))||(_.has(icon, 'class') && (this.type === 'div'))) {
-                        return true;
-                    }
-                }, {type: type});
+                    });
+                }
+                else {
+                    return false;
+                }
             };
 
             scope.rowClass = function (row) {
@@ -469,9 +474,9 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
 
             scope.hasValue = function(row, column) {
                 if (_.isArray(column.dataField)) {
-                    return _.any(column.dataField, function (fieldName) {
-                        return (_.has(this, fieldName) && !_.isEmpty(this, fieldName));
-                    }, row);
+                    return _.some(column.dataField, function (fieldName) {
+                        return (_.has(row, fieldName) && !_.isEmpty(row, fieldName));
+                    });
                 } else {
                     return (_.has(row, column.dataField) && !_.isEmpty(row, column.dataField));
                 }
@@ -587,21 +592,21 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                     scope.markPresetAsCustom();
                 }
 
-                if (!_.contains(scope.columnDisplay.config, columnIndex)) {
+                if (!_.includes(scope.columnDisplay.config, columnIndex)) {
                     scope.columnDisplay.config.push(columnIndex);
                 }
             };
 
             scope.getAvailableColumns = function () {
                 return _.filter(scope.columnConfiguration, function (column) {
-                    return (!_.contains(scope.columnDisplay.config, column.id));
+                    return (!_.includes(scope.columnDisplay.config, column.id));
                 });
             };
 
             scope.findColumnFromPredicate = function (pred) {
                 var column = _.find(scope.getConfig(), function (column) {
-                    return (this.pred == this.getSortField(column));
-                }, {pred: pred, getSortField: scope.getSortField});
+                    return (pred == scope.getSortField(column));
+                });
 
                 return column || {};
             };
@@ -784,8 +789,8 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                 var returnSelects = [];
 
                 _.forEach(scope.getConfig(), function (column) {
-                    this.retObj.push({'text': column.title, 'value': this.getSortField(column)});
-                }, {'retObj': returnSelects, 'getSortField': scope.getSortField});
+                    returnSelects.push({'text': column.title, 'value': scope.getSortField(column)});
+                });
 
                 return _.filter(_.filter(returnSelects, 'text'), 'value');
             };
@@ -967,9 +972,9 @@ app.filter('UnusedSorts', function() {
             if (currentColumn == sortField) {
                 return true;
             } else {
-                return !(_.contains(this.predicate, sortField) || _.contains(this.predicate, '-'+sortField));
+                return !(_.includes(predicates, sortField) || _.includes(predicates, '-'+sortField));
             }
-        }, {predicate: predicates});
+        });
 
     };
 });
@@ -986,23 +991,23 @@ app.filter('ColumnValue', function ($filter) {
         }
 
         _.forEach(field, function (fieldName, fieldIndex, field) {
-            if (_.has(this.row, fieldName)) {
-                if (_.has(this.column, 'filter')) {
-                    if (_.has(this.column, 'filterParameters')) {
-                        this.columnValue.value += $filter(this.column.filter).apply(this, [this.row[fieldName]].concat(this.column.filterParameters));
+            if (_.has(row, fieldName)) {
+                if (_.has(column, 'filter')) {
+                    if (_.has(column, 'filterParameters')) {
+                        columnValue.value += $filter(column.filter).apply([row[fieldName]].concat(column.filterParameters));
                     } else {
-                        this.columnValue.value += $filter(this.column.filter)(this.row[fieldName]);
+                        columnValue.value += $filter(column.filter)(row[fieldName]);
                     }
                 } else {
-                    this.columnValue.value += this.row[fieldName];
+                    columnValue.value += row[fieldName];
                 }
 
                 if (fieldIndex < field.length - 1) {
-                    this.columnValue.value += '\n';
+                    columnValue.value += '\n';
                 }
 
             }
-        }, {columnValue: columnValue, column: column, row: row});
+        });
 
         columnValue = columnValue.value;
         if (allowEditing) {
@@ -1254,7 +1259,7 @@ angular.module('rxDataTable').run(['$templateCache', function ($templateCache) {
 	$templateCache.put('src/templates/htmlPopover.html', '<div class="popover {{placement}}" ng-class="{ in: isOpen(), fade: animation() }"> <div class="arrow"></div> <div class="popover-inner"> <h3 class="popover-title" bind-html-unsafe="title" ng-show="title"></h3> <div class="popover-content" bind-html-unsafe="content"></div> </div> </div>');
 	$templateCache.put('src/templates/rx-data-table-itemsPerPage.html', '<span class="pagination-items-per-page"> Show: <a ng-repeat-start="i in pagerObject.itemSizeList" ng-click="updatePaging(i)" ng-class="{ disabled: pagerObject.itemsPerPage===i }">{{ i }}</a> <span ng-repeat-end ng-show="!$last">|</span> </span> ');
 	$templateCache.put('src/templates/rx-data-table-paginate.html', '<ul class="pagination"> <li ng-class="{disabled: pageTracking.pageNumber==0}" class="pagination-first"> <a ng-click="pageTracking.pageNumber=0" ng-hide="pageTracking.pageNumber==0">First</a> <span ng-show="pageTracking.pageNumber==0">First</span> </li> <li ng-class="{disabled: pageTracking.pageNumber==0}" class="pagination-prev"> <a ng-click="pageTracking.pageNumber=(pageTracking.pageNumber - 1)" ng-hide="pageTracking.pageNumber==0">« Prev</a> <span ng-show="pageTracking.pageNumber==0">« Prev</span> </li> <li ng-repeat="n in pageTracking | Page " ng-class="{active: n==pageTracking.pageNumber, \'page-number-last\': n==pageTracking.totalPages - 1}" class="pagination-page"> <a ng-click="pageTracking.pageNumber=n">{{n + 1}}</a> </li> <li ng-class="{disabled: pageTracking.pageNumber==pageTracking.totalPages - 1 || pageTracking.total==0}" class="pagination-next"> <a ng-click="pageTracking.pageNumber=(pageTracking.pageNumber + 1)" ng-hide="pageTracking.pageNumber==pageTracking.totalPages - 1 || pageTracking.total==0"> Next »</a> <span ng-show="pageTracking.pageNumber==pageTracking.totalPages - 1">Next »</span> </li> <li ng-class="{disabled: pageTracking.pageNumber==pageTracking.totalPages - 1}" class="pagination-last"> <a ng-click="pageTracking.pageNumber=pageTracking.totalPages - 1" ng-hide="pageTracking.pageNumber==pageTracking.totalPages - 1">Last</a> <span ng-show="pageTracking.pageNumber==pageTracking.totalPages - 1">Last</span> </li> </ul> ');
-	$templateCache.put('src/templates/rx-data-table.html', '<div class="data-table"> <div class=\'alert\' ng-show="updateFieldStatus" ng-class="{\'loading\': updateFieldStatus.status==\'saving\', \'success\': updateFieldStatus.status==\'success\', \'error\': updateFieldStatus.status==\'error\'}"> {{ updateFieldStatus.message }} </div> <div class="data-info-row"> <div class="data-table-config-container" ng-if="enableColumnReordering||enableColumnMultiSort" ng-class="{\'dropdown-shown\': configurationVisible}"> <button class="btn-link" ng-click="toggleVisibility()"> <i class="fa fa-table data-table-config-icon" title="Configure Data Table"></i> </button> <div class="data-table-config reveal-animation" ng-show="configurationVisible"> <div class="header" ng-if="enableColumnMultiSort">Sorting</div> <div class="data-table-multi-sort" ng-if="enableColumnMultiSort"> <div class="data-config-row"> <div class="multi-sort-select header">Column</div> <div class="multi-sort-reverse-icon header">Dir</div> <div class="multi-sort-remove-icon header"><span ng-show="predicate.length> 1">Rem</span></div> </div> <div class="data-config-row" ng-repeat="pred in predicate" ng-init="predColumn=decompilePredicateString(pred)"> <div class="multi-sort-select"> <select rx-select name="sort-{{$index}}" ng-model="predColumn.column" ng-change="updatePredicate($index, predColumn.column)"> <option ng-repeat="column in getConfig() | UnusedSorts:predicate:predColumn.column:sortable" value="{{ getSortField(column) }}" ng-selected="getSortField(column)==predColumn.column">{{ column.title }}</option> </select> </div> <button class="btn-link multi-sort-reverse-icon" ng-click="reversePredicate($index)"> <i class="fa" ng-class="{\'fa-sort-amount-asc\': !parseReverseSort(predColumn.column, predColumn.reverse), \'fa-sort-amount-desc\': parseReverseSort(predColumn.column, predColumn.reverse)}"></i> </button> <div class="multi-sort-remove-icon"> <button class="btn-link" ng-click="removePredicate($index)"> <i class="fa fa-times" ng-if="predicate.length> 1"></i> </button> </div> </div> <button class="btn-link multi-sort-add" ng-if="canAddNewMultiSort()" ng-click="predicate.push(\'\')"> Add New Sort </button> </div> <div class="header" ng-if="enableColumnReordering">Column Configuration</div> <div class="data-table-column-display" ng-if="enableColumnReordering"> <div class="data-config-row"> <div class="header">Column Presets</div> </div> <div class="data-config-row column-preset-row"> <select rx-select ng-options="getColumnPresets().indexOf(preset) as preset.title for preset in getColumnPresets()" ng-model="columnDisplay.index"></select> </div> <div class="data-config-row"> <div class="header">Column Order</div> </div> <div class="data-config-row" ng-repeat="column in getConfig()"> <div class="data-config-column-title"> {{ column.title }} </div> <div class="column-order-arrows"> <button class="btn-link btn-move-down" ng-if="!$last" ng-click="moveColumnDown($index)"> <i class="fa fa-arrow-down"></i> </button> <button class="btn-link btn-move-up" ng-if="!$first" ng-click="moveColumnUp($index)"> <i class="fa fa-arrow-up"></i> </button> </div> <div class="column-hide-display"> <button class="btn-link" ng-click="removeColumn($index)"> <i class="fa fa-times"></i> </button> </div> </div> <div class="data-config-row" ng-if="getAvailableColumns().length> 0"> <div class="header">Available Columns</div> </div> <div class="data-config-row column-show-columns" ng-if="getAvailableColumns().length> 0"> <select rx-select ng-model="addColumn.index" ng-options="column.id as column.title for column in getAvailableColumns()"> </select> <button ng-click="showColumn(addColumn.index)" class="button button-tiny">add</button> </div> </div> </div> </div> </div> <div class="data-header"> <div class="data-header-cell data-column-{{ $index + 1 }} flex-columns-{{ column.cols }}" ng-repeat="column in getConfig()" data-title="{{ column.title && column.title || column.dataField }}" ng-class="sortClass(column, $index)" draggable="true" ng-click="sort($event, column)" popover="{{ column.help.body }}" popover-append-to-body="true" popover-popup-delay="1500" popover-title="{{ column.help.title }}" popover-trigger="mouseenter" popover-placement="top-left"> <span class="checkbox-span" ng-if="column.checkbox && column.checkAll"> <input ng-click="checkAll(this)" type="checkbox" id="check_all_checkbox"> </span> <span ng-if="!column.checkbox" class="btn-link data-link" style="text-decoration: none"> <span class=\'data-header-cell-content\'>{{ column.title }}</span> <i ng-if="column.help" class="fa fa-question-circle"></i> <i class="fa fa-chevron-down" ng-show="sortedBy(column, true)"></i> <i class="fa fa-chevron-up" ng-show="sortedBy(column)"></i> </span> </div> <div class="data-header-cell data-header-expander" ng-if="showRowDetails"></div> </div> <div class="data-loader" ng-if="loadingData()"> <div class="spinner-container"> <div class="spinner"></div> <div class="loader-text">Loading...</div> </div> </div> <div class="data-row data-row-{{ $index + 1}}" ng-repeat="row in listOfData() | rxDataTableSorting:predicate:pagerObject | Paginate:pagerObject track by row[rowKey]||$index" data-row-key="{{row[rowKey]}}" ng-class="rowClass(row)"> <div class="data-row-prefix" ng-if="rowPrefixClause===\'true\'"> <div class="prefix-container" ng-if="shouldHaveRowPrefix(row)" ng-bind-html="rowPrefix()(row)"> </div> </div> <div class="data-cell flex-columns-{{ column.cols }} data-column-{{ $index + 1}} {{ column.class }}" ng-repeat="column in getConfig()" data-title="{{ column.title }}" ng-class="getNGClass(column, row)" ng-mouseenter="cellMouseEnter($event)" ng-mouseleave="cellMouseLeave($event)"> <div ng-if="column.checkbox" class="checkbox"> <input type="checkbox" value="{{ row[column.dataField] }}" ng-click="clickAction(\'{{ row[column.dataField] }}\')" id="checkbox_{{ row[column.dataField] }}"> </div> <div ng-if="column.menu" class="menu-column"> <button class="menu-toggle btn-link" ng-click="toggleMenu(row, column)"> <i ng-if="!column.menu.icon" class="fa fa-cog fa-lg"></i> <i ng-if="column.menu.icon" class="fa" ng-class="column.menu.icon"></i> </button> <ul class="menu-items" ng-show="isMenuShown(row, column)"> <li class="menu-item" ng-repeat="menuItem in column.menu.items"> <button class="btn-link" ng-class="menuItem.class" ng-click="executeAction(row, menuItem)"> <i ng-if="menuItem.icon" class="fa" ng-class="menuItem.icon"></i> <span class="menu-item-text">{{ menuItem.text }}</span> </button> </li> </ul> </div> <div ng-if="!column.checkbox && !column.menu"> <i ng-repeat="icon in iconUnwrap(column, row, \'i\')" class="data-table-cell-icon {{ icon.name }}" tooltip="{{ icon.tooltip.text }}" tooltip-append-to-body="true" tooltip-placement="{{ (icon.tooltip.placement) ? icon.tooltip.placement : \'top\' }}"></i> <div ng-repeat="icon in iconUnwrap(column, row, \'div\')" class="data-table-cell-icon {{ icon.class }}" alt="{{ icon.alt }}" tooltip="{{ icon.tooltip.text }}" tooltip-append-to-body="true" tooltip-placement="{{ (icon.tooltip.placement) ? icon.tooltip.placement : \'top\' }}"></div> <span ng-if="buildContent(row, column)" class="data-cell-content" ng-bind-html="buildContent(row, column)"></span> <a ng-if="!buildContent(row, column) && buildLink(row, column) && hasValue(row, column)" href="{{ buildLink(row, column) }}" class="data-cell-content" target="{{ (column.linkTarget) ? column.linkTarget : \'_blank\' }}">{{ row | ColumnValue:column }}</a> <span ng-if="!buildContent(row, column) && !buildLink(row, column) && hasValue(row, column)" class="data-cell-content"> <span ng-if="!allowEditing(column,row) && column.dataField !=\'score\'">{{ row | ColumnValue:column:false }}</span> <span ng-if="!allowEditing(column,row) && column.dataField===\'score\'" popover-html-unsafe="{{scoreTooltipTemplate(row)}}" popover-title="Prioritization Score" popover-append-to-body="true" popover-placement="right" popover-trigger="mouseenter">{{ row | ColumnValue:column }}</span> <span ng-if="allowEditing(column,row)" class="data-editable"> <span ng-switch="getEditType(column, row)"> <span ng-switch-when="select" class="data-editable-field" editable-select="row[column.dataField]" e-ng-options="o.value as o.text for o in getEditableOptions(column, row)" buttons="no" onbeforesave="updateField(column, row, $data, this)">{{ row | ColumnValue:column }}</span> <span ng-switch-when="typeahead" class="data-editable-field" editable-text="row[column.dataField]" e-typeahead="o.value as o.text for o in getEditableOptions(column, row, $viewValue) | filter:$viewValue" e-typeahead-on-select="updateField(column, row, $data, this)" buttons="no" onshow="getEditableOptions(column, row)">{{ row | ColumnValue:column }}</span> <span ng-switch-default class="data-editable-field" editable-text="row[column.dataField]" onbeforesave="updateField(column, row, $data, this)">{{ row | ColumnValue:column }}</span> <button class="data-table-field-nullable btn-link" ng-if="column.editable.nullable" ng-click="nullField(column, row, this)" title="Remove {{ column.title }} Value"> <i class="fa fa-times fa-lg"></i> </button> </span> </span> </span> </div> </div> <div class="data-row-expander" ng-if="showRowDetails"> <button class="data-row-expansion" ng-show="canExpandRow(row)" ng-click="toggleRow(row[rowKey])" ng-class="{\'expanded\': currentRow==row[rowKey]}"> <div class="expander-icon"></div> &nbsp; </button> </div> </div> <div ng-if="!pagerObject.showAll" class="pagination-container" ng-show="pagerObject.total> 0"> <div class="cell"><span ng-if="!pagerObject.showAll">{{(pagerObject.last == 0) ? \'0\' : pagerObject.first}} - {{pagerObject.last}} of <span class=\'total-data-items\'>{{pagerObject.total}} {{ itemName && itemName || \'Items\' }}</span></span></div> <div class="cell"><rx-data-table-paginate page-tracking="pagerObject"></rx-data-table-paginate></div> <div class="cell"><rx-data-table-items-per-page></rx-data-table-items-per-page></div> </div> </div> ');
+	$templateCache.put('src/templates/rx-data-table.html', '<div class="data-table"> <div class=\'alert\' ng-show="updateFieldStatus" ng-class="{\'loading\': updateFieldStatus.status==\'saving\', \'success\': updateFieldStatus.status==\'success\', \'error\': updateFieldStatus.status==\'error\'}"> {{ updateFieldStatus.message }} </div> <div class="data-info-row"> <div class="data-table-config-container" ng-if="enableColumnReordering||enableColumnMultiSort" ng-class="{\'dropdown-shown\': configurationVisible}"> <button class="btn-link" ng-click="toggleVisibility()"> <i class="fa fa-table data-table-config-icon" title="Configure Data Table"></i> </button> <div class="data-table-config reveal-animation" ng-show="configurationVisible"> <div class="header" ng-if="enableColumnMultiSort">Sorting</div> <div class="data-table-multi-sort" ng-if="enableColumnMultiSort"> <div class="data-config-row"> <div class="multi-sort-select header">Column</div> <div class="multi-sort-reverse-icon header">Dir</div> <div class="multi-sort-remove-icon header"><span ng-show="predicate.length> 1">Rem</span></div> </div> <div class="data-config-row" ng-repeat="pred in predicate" ng-init="predColumn=decompilePredicateString(pred)"> <div class="multi-sort-select"> <select rx-select name="sort-{{$index}}" ng-model="predColumn.column" ng-change="updatePredicate($index, predColumn.column)"> <option ng-repeat="column in getConfig() | UnusedSorts:predicate:predColumn.column:sortable" value="{{ getSortField(column) }}" ng-selected="getSortField(column)==predColumn.column">{{ column.title }}</option> </select> </div> <button class="btn-link multi-sort-reverse-icon" ng-click="reversePredicate($index)"> <i class="fa" ng-class="{\'fa-sort-amount-asc\': !parseReverseSort(predColumn.column, predColumn.reverse), \'fa-sort-amount-desc\': parseReverseSort(predColumn.column, predColumn.reverse)}"></i> </button> <div class="multi-sort-remove-icon"> <button class="btn-link" ng-click="removePredicate($index)"> <i class="fa fa-times" ng-if="predicate.length> 1"></i> </button> </div> </div> <button class="btn-link multi-sort-add" ng-if="canAddNewMultiSort()" ng-click="predicate.push(\'\')"> Add New Sort </button> </div> <div class="header" ng-if="enableColumnReordering">Column Configuration</div> <div class="data-table-column-display" ng-if="enableColumnReordering"> <div class="data-config-row"> <div class="header">Column Presets</div> </div> <div class="data-config-row column-preset-row"> <select rx-select ng-options="getColumnPresets().indexOf(preset) as preset.title for preset in getColumnPresets()" ng-model="columnDisplay.index"></select> </div> <div class="data-config-row"> <div class="header">Column Order</div> </div> <div class="data-config-row" ng-repeat="column in getConfig()"> <div class="data-config-column-title"> {{ column.title }} </div> <div class="column-order-arrows"> <button class="btn-link btn-move-down" ng-if="!$last" ng-click="moveColumnDown($index)"> <i class="fa fa-arrow-down"></i> </button> <button class="btn-link btn-move-up" ng-if="!$first" ng-click="moveColumnUp($index)"> <i class="fa fa-arrow-up"></i> </button> </div> <div class="column-hide-display"> <button class="btn-link" ng-click="removeColumn($index)"> <i class="fa fa-times"></i> </button> </div> </div> <div class="data-config-row" ng-if="getAvailableColumns().length> 0"> <div class="header">Available Columns</div> </div> <div class="data-config-row column-show-columns" ng-if="getAvailableColumns().length> 0"> <select rx-select ng-model="addColumn.index" ng-options="column.id as column.title for column in getAvailableColumns()"> </select> <button ng-click="showColumn(addColumn.index)" class="button button-tiny">add</button> </div> </div> </div> </div> </div> <div class="data-header"> <div class="data-header-cell data-column-{{ $index + 1 }} flex-columns-{{ column.cols }}" ng-repeat="column in getConfig()" data-title="{{ column.title && column.title || column.dataField }}" ng-class="sortClass(column, $index)" draggable="true" ng-click="sort($event, column)" popover="{{ column.help.body }}" popover-append-to-body="true" popover-popup-delay="1500" popover-title="{{ column.help.title }}" popover-trigger="mouseenter" popover-placement="top-left"> <span class="checkbox-span" ng-if="column.checkbox && column.checkAll"> <input ng-click="checkAll(this)" type="checkbox" id="check_all_checkbox"> </span> <span ng-if="!column.checkbox" class="btn-link data-link" style="text-decoration: none"> <span class=\'data-header-cell-content\'>{{ column.title }}</span> <i ng-if="column.help" class="fa fa-question-circle"></i> <i class="fa fa-chevron-down" ng-show="sortedBy(column, true)"></i> <i class="fa fa-chevron-up" ng-show="sortedBy(column)"></i> </span> </div> <div class="data-header-cell data-header-expander" ng-if="showRowDetails"></div> </div> <div class="data-loader" ng-if="loadingData()"> <div class="spinner-container"> <div class="spinner"></div> <div class="loader-text">Loading...</div> </div> </div> <div class="data-row data-row-{{ $index + 1}}" ng-repeat="row in listOfData() | rxDataTableSorting:predicate:pagerObject | Paginate:pagerObject track by row[rowKey]||$index" data-row-key="{{row[rowKey]}}" ng-class="rowClass(row)"> <div class="data-row-prefix" ng-if="rowPrefixClause===\'true\'"> <div class="prefix-container" ng-if="shouldHaveRowPrefix(row)" ng-bind-html="rowPrefix()(row)"> </div> </div> <div class="data-cell flex-columns-{{ column.cols }} data-column-{{ $index + 1}} {{ column.class }}" ng-repeat="column in getConfig()" data-title="{{ column.title }}" ng-class="getNGClass(column, row)" ng-mouseenter="cellMouseEnter($event)" ng-mouseleave="cellMouseLeave($event)"> <div ng-if="column.checkbox" class="checkbox"> <input type="checkbox" value="{{ row[column.dataField] }}" ng-click="clickAction(\'{{ row[column.dataField] }}\')" id="checkbox_{{ row[column.dataField] }}"> </div> <div ng-if="column.menu" class="menu-column"> <button class="menu-toggle btn-link" ng-click="toggleMenu(row, column)"> <i ng-if="!column.menu.icon" class="fa fa-cog fa-lg"></i> <i ng-if="column.menu.icon" class="fa" ng-class="column.menu.icon"></i> </button> <ul class="menu-items" ng-show="isMenuShown(row, column)"> <li class="menu-item" ng-repeat="menuItem in column.menu.items"> <button class="btn-link" ng-class="menuItem.class" ng-click="executeAction(row, menuItem)"> <i ng-if="menuItem.icon" class="fa" ng-class="menuItem.icon"></i> <span class="menu-item-text">{{ menuItem.text }}</span> </button> </li> </ul> </div> <div ng-if="!column.checkbox && !column.menu"> <i ng-repeat="icon in ::iconUnwrap(column, row, \'i\')" class="data-table-cell-icon ::{{ icon.name }}" tooltip="{{ icon.tooltip.text }}" tooltip-append-to-body="true" tooltip-placement="{{ (icon.tooltip.placement) ? icon.tooltip.placement : \'top\' }}"></i> <div ng-repeat="icon in ::iconUnwrap(column, row, \'div\')" class="data-table-cell-icon ::{{ icon.class }}" alt="{{ icon.alt }}" tooltip="{{ icon.tooltip.text }}" tooltip-append-to-body="true" tooltip-placement="{{ (icon.tooltip.placement) ? icon.tooltip.placement : \'top\' }}"></div> <span ng-if="buildContent(row, column)" class="data-cell-content" ng-bind-html="buildContent(row, column)"></span> <a ng-if="!buildContent(row, column) && buildLink(row, column) && hasValue(row, column)" href="{{ buildLink(row, column) }}" class="data-cell-content" target="{{ (column.linkTarget) ? column.linkTarget : \'_blank\' }}">{{ row | ColumnValue:column }}</a> <span ng-if="!buildContent(row, column) && !buildLink(row, column) && hasValue(row, column)" class="data-cell-content"> <span ng-if="!allowEditing(column,row) && column.dataField !=\'score\'">{{ row | ColumnValue:column:false }}</span> <span ng-if="!allowEditing(column,row) && column.dataField===\'score\'" popover-html-unsafe="{{scoreTooltipTemplate(row)}}" popover-title="Prioritization Score" popover-append-to-body="true" popover-placement="right" popover-trigger="mouseenter">{{ row | ColumnValue:column }}</span> <span ng-if="allowEditing(column,row)" class="data-editable"> <span ng-switch="getEditType(column, row)"> <span ng-switch-when="select" class="data-editable-field" editable-select="row[column.dataField]" e-ng-options="o.value as o.text for o in getEditableOptions(column, row)" buttons="no" onbeforesave="updateField(column, row, $data, this)">{{ row | ColumnValue:column }}</span> <span ng-switch-when="typeahead" class="data-editable-field" editable-text="row[column.dataField]" e-typeahead="o.value as o.text for o in getEditableOptions(column, row, $viewValue) | filter:$viewValue" e-typeahead-on-select="updateField(column, row, $data, this)" buttons="no" onshow="getEditableOptions(column, row)">{{ row | ColumnValue:column }}</span> <span ng-switch-default class="data-editable-field" editable-text="row[column.dataField]" onbeforesave="updateField(column, row, $data, this)">{{ row | ColumnValue:column }}</span> <button class="data-table-field-nullable btn-link" ng-if="column.editable.nullable" ng-click="nullField(column, row, this)" title="Remove {{ column.title }} Value"> <i class="fa fa-times fa-lg"></i> </button> </span> </span> </span> </div> </div> <div class="data-row-expander" ng-if="showRowDetails"> <button class="data-row-expansion" ng-show="canExpandRow(row)" ng-click="toggleRow(row[rowKey])" ng-class="{\'expanded\': currentRow==row[rowKey]}"> <div class="expander-icon"></div> &nbsp; </button> </div> </div> <div ng-if="!pagerObject.showAll" class="pagination-container" ng-show="pagerObject.total> 0"> <div class="cell"><span ng-if="!pagerObject.showAll">{{(pagerObject.last == 0) ? \'0\' : pagerObject.first}} - {{pagerObject.last}} of <span class=\'total-data-items\'>{{pagerObject.total}} {{ itemName && itemName || \'Items\' }}</span></span></div> <div class="cell"><rx-data-table-paginate page-tracking="pagerObject"></rx-data-table-paginate></div> <div class="cell"><rx-data-table-items-per-page></rx-data-table-items-per-page></div> </div> </div> ');
 }]);
 // Add ability to use html within popovers. Introduced in versions above angularui 0.13
 angular.module('ui.bootstrap.popover')
