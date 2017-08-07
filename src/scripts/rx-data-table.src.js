@@ -430,17 +430,17 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
             };
 
             scope.iconUnwrap = function (column, row, type) {
-                return _.filter(column.icon, _.bind(function (icon) {
+                return _.filter(column.icon, function (icon) {
                     if (_.has(icon, 'fieldValue')) {
-                        if (_.isArray(this.row[icon.field]) && _.includes(this.row[icon.field], icon.fieldValue)) {
+                        if (_.isArray(row[icon.field]) && _.includes(row[icon.field], icon.fieldValue)) {
                             return true;
-                        } else if (icon.fieldValue === this.row[icon.field]) {
+                        } else if (icon.fieldValue === row[icon.field]) {
                             return true;
                         }
                     }
 
                     if (_.has(icon, 'fieldValues')) {
-                        return _.isArray(icon.fieldValues) && _.includes(icon.fieldValues, this.row[icon.field]);
+                        return _.isArray(icon.fieldValues) && _.includes(icon.fieldValues, row[icon.field]);
                     } else if (row[icon.field] === true) {
                         return true;
                     } else if (_.has(icon, 'fieldMinLength') && _.isArray(row[icon.field])) {
@@ -450,11 +450,11 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                     } else if (_.has(icon, 'editable') && icon.editable === true) {
                         return !_.isUndefined(column.editable) && column.editable.clause(row);
                     }
-                }, {row: row})).filter(function (icon) {
-                    if ((_.has(icon, 'name') && (this.type === 'i'))||(_.has(icon, 'class') && (this.type === 'div'))) {
+                }).filter(function (icon) {
+                    if ((_.has(icon, 'name') && (type === 'i'))||(_.has(icon, 'class') && (type === 'div'))) {
                         return true;
                     }
-                }, {type: type});
+                });
             };
 
             scope.rowClass = function (row) {
@@ -595,9 +595,9 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
             };
 
             scope.findColumnFromPredicate = function (pred) {
-                var column = _.find(scope.getConfig(), _.bind(function (column) {
-                    return (this.pred == this.getSortField(column));
-                }, {pred: pred, getSortField: scope.getSortField}));
+                var column = _.find(scope.getConfig(), function (column) {
+                    return (pred === scope.getSortField(column));
+                });
 
                 return column || {};
             };
