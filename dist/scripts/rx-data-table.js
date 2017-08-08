@@ -432,15 +432,15 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
             scope.iconUnwrap = function (column, row, type) {
                 return _.filter(column.icon, function (icon) {
                     if (_.has(icon, 'fieldValue')) {
-                        if (_.isArray(this.row[icon.field]) && _.contains(this.row[icon.field], icon.fieldValue)) {
+                        if (_.isArray(row[icon.field]) && _.includes(row[icon.field], icon.fieldValue)) {
                             return true;
-                        } else if (icon.fieldValue === this.row[icon.field]) {
+                        } else if (icon.fieldValue === row[icon.field]) {
                             return true;
                         }
                     }
 
                     if (_.has(icon, 'fieldValues')) {
-                        return _.isArray(icon.fieldValues) && _.contains(icon.fieldValues, this.row[icon.field]);
+                        return _.isArray(icon.fieldValues) && _.includes(icon.fieldValues, row[icon.field]);
                     } else if (row[icon.field] === true) {
                         return true;
                     } else if (_.has(icon, 'fieldMinLength') && _.isArray(row[icon.field])) {
@@ -450,11 +450,11 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                     } else if (_.has(icon, 'editable') && icon.editable === true) {
                         return !_.isUndefined(column.editable) && column.editable.clause(row);
                     }
-                }, {row: row}).filter(function (icon) {
-                    if ((_.has(icon, 'name') && (this.type === 'i'))||(_.has(icon, 'class') && (this.type === 'div'))) {
+                }).filter(function (icon) {
+                    if ((_.has(icon, 'name') && (type === 'i'))||(_.has(icon, 'class') && (type === 'div'))) {
                         return true;
                     }
-                }, {type: type});
+                });
             };
 
             scope.rowClass = function (row) {
@@ -465,9 +465,9 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
 
             scope.hasValue = function(row, column) {
                 if (_.isArray(column.dataField)) {
-                    return _.any(column.dataField, function (fieldName) {
+                    return _.some(column.dataField, _.bind(function (fieldName) {
                         return (_.has(this, fieldName) && !_.isEmpty(this, fieldName));
-                    }, row);
+                    }, row));
                 } else {
                     return (_.has(row, column.dataField) && !_.isEmpty(row, column.dataField));
                 }
@@ -583,21 +583,21 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                     scope.markPresetAsCustom();
                 }
 
-                if (!_.contains(scope.columnDisplay.config, columnIndex)) {
+                if (!_.includes(scope.columnDisplay.config, columnIndex)) {
                     scope.columnDisplay.config.push(columnIndex);
                 }
             };
 
             scope.getAvailableColumns = function () {
                 return _.filter(scope.columnConfiguration, function (column) {
-                    return (!_.contains(scope.columnDisplay.config, column.id));
+                    return !_.includes(scope.columnDisplay.config, column.id);
                 });
             };
 
             scope.findColumnFromPredicate = function (pred) {
                 var column = _.find(scope.getConfig(), function (column) {
-                    return (this.pred == this.getSortField(column));
-                }, {pred: pred, getSortField: scope.getSortField});
+                    return (pred === scope.getSortField(column));
+                });
 
                 return column || {};
             };
@@ -779,9 +779,9 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
             scope.getSortableColumnSelects = function () {
                 var returnSelects = [];
 
-                _.forEach(scope.getConfig(), function (column) {
+                _.forEach(scope.getConfig(), _.bind(function (column) {
                     this.retObj.push({'text': column.title, 'value': this.getSortField(column)});
-                }, {'retObj': returnSelects, 'getSortField': scope.getSortField});
+                }, {'retObj': returnSelects, 'getSortField': scope.getSortField}));
 
                 return _.filter(_.filter(returnSelects, 'text'), 'value');
             };
@@ -950,7 +950,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
 
 app.filter('UnusedSorts', function() {
     return function(configObject, predicates, currentColumn, sortableFunction) {
-        return _.filter(configObject, function (column) {
+        return _.filter(configObject, _.bind(function (column) {
             // This is here to find the sortField value
             var sortField = '';
             if (_.isObject(column)) {
@@ -963,9 +963,9 @@ app.filter('UnusedSorts', function() {
             if (currentColumn == sortField) {
                 return true;
             } else {
-                return !(_.contains(this.predicate, sortField) || _.contains(this.predicate, '-'+sortField));
+                return !(_.includes(this.predicate, sortField) || _.includes(this.predicate, '-'+sortField));
             }
-        }, {predicate: predicates});
+        }, {predicate: predicates}));
 
     };
 });
@@ -981,7 +981,7 @@ app.filter('ColumnValue', function ($filter) {
             field = [field];
         }
 
-        _.forEach(field, function (fieldName, fieldIndex, field) {
+        _.forEach(field, _.bind(function (fieldName, fieldIndex, field) {
             if (_.has(this.row, fieldName)) {
                 if (_.has(this.column, 'filter')) {
                     if (_.has(this.column, 'filterParameters')) {
@@ -998,7 +998,7 @@ app.filter('ColumnValue', function ($filter) {
                 }
 
             }
-        }, {columnValue: columnValue, column: column, row: row});
+        }, {columnValue: columnValue, column: column, row: row}));
 
         columnValue = columnValue.value;
         if (allowEditing) {
