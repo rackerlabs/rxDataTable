@@ -1,6 +1,6 @@
 <div class="data-table">
     <div class='alert' ng-show="updateFieldStatus" ng-class="{'loading': updateFieldStatus.status == 'saving', 'success': updateFieldStatus.status == 'success', 'error': updateFieldStatus.status == 'error'}">
-        {{ updateFieldStatus.message }}
+        {{ ::updateFieldStatus.message }}
     </div>
     <div class="data-info-row">
         <div class="data-table-config-container" ng-if="enableColumnReordering||enableColumnMultiSort" ng-class="{'dropdown-shown': configurationVisible}">
@@ -15,10 +15,10 @@
                         <div class="multi-sort-reverse-icon header">Dir</div>
                         <div class="multi-sort-remove-icon header"><span ng-show="predicate.length > 1">Rem</span></div>
                     </div>
-                    <div class="data-config-row" ng-repeat="pred in predicate" ng-init="predColumn = decompilePredicateString(pred)">
+                    <div class="data-config-row" ng-repeat="pred in ::predicate" ng-init="predColumn = decompilePredicateString(pred)">
                         <div class="multi-sort-select">
-                            <select rx-select name="sort-{{$index}}" ng-model="predColumn.column" ng-change="updatePredicate($index, predColumn.column)">
-                                <option ng-repeat="column in getConfig() | UnusedSorts:predicate:predColumn.column:sortable" value="{{ getSortField(column) }}" ng-selected="getSortField(column) == predColumn.column">{{ column.title }}</option>
+                            <select rx-select name="sort-{{::$index}}" ng-model="predColumn.column" ng-change="updatePredicate($index, predColumn.column)">
+                                <option ng-repeat="column in getConfig() | UnusedSorts:predicate:predColumn.column:sortable" value="{{ getSortField(column) }}" ng-selected="getSortField(column) == predColumn.column">{{ ::column.title }}</option>
                             </select>
                         </div>
                         <button class="btn-link multi-sort-reverse-icon" ng-click="reversePredicate($index)">
@@ -26,7 +26,7 @@
                         </button>
                         <div class="multi-sort-remove-icon">
                             <button class="btn-link" ng-click="removePredicate($index)">
-                                <i class="fa fa-times" ng-if="predicate.length > 1"></i>
+                                <i class="fa fa-times" ng-if="::predicate.length > 1"></i>
                             </button>
                         </div>
                     </div>
@@ -45,9 +45,9 @@
                     <div class="data-config-row">
                         <div class="header">Column Order</div>
                     </div>
-                    <div class="data-config-row" ng-repeat="column in getConfig()">
+                    <div class="data-config-row" ng-repeat="column in ::getConfig()">
                         <div class="data-config-column-title">
-                            {{ column.title }}
+                            {{ ::column.title }}
                         </div>
                         <div class="column-order-arrows">
                             <button class="btn-link btn-move-down" ng-if="!$last" ng-click="moveColumnDown($index)">
@@ -67,7 +67,7 @@
                         <div class="header">Available Columns</div>
                     </div>
                     <div class="data-config-row column-show-columns" ng-if="getAvailableColumns().length > 0">
-                        <select rx-select ng-model="addColumn.index" ng-options="column.id as column.title for column in getAvailableColumns()">
+                        <select rx-select ng-model="addColumn.index" ng-options="column.id as column.title for column in ::getAvailableColumns()">
                         </select>
                         <button ng-click="showColumn(addColumn.index)" class="button button-tiny">add</button>
                     </div>
@@ -76,13 +76,13 @@
         </div>
     </div>
     <div class="data-header">
-        <div class="data-header-cell data-column-{{ $index + 1 }} flex-columns-{{ column.cols }}" ng-repeat="column in getConfig()" data-title="{{ column.title && column.title || column.dataField }}" ng-class="sortClass(column, $index)" draggable="true"
-          ng-click="sort($event, column)" popover="{{ column.help.body }}" popover-append-to-body="true" popover-popup-delay="1500" popover-title="{{ column.help.title }}" popover-trigger="mouseenter" popover-placement="top-left">
+        <div class="data-header-cell data-column-{{ ::($index + 1) }} flex-columns-{{ ::column.cols }}" ng-repeat="column in getConfig()" data-title="{{ column.title && column.title || column.dataField }}" ng-class="sortClass(column, $index)" draggable="true"
+          ng-click="sort($event, column)" popover="{{ column.help.body }}" popover-append-to-body="true" popover-popup-delay="1500" popover-title="{{ ::column.help.title }}" popover-trigger="mouseenter" popover-placement="top-left">
             <span class="checkbox-span" ng-if="column.checkbox && column.checkAll">
                 <input ng-click="checkAll(this)" type="checkbox" id="check_all_checkbox">
             </span>
             <span ng-if="!column.checkbox" class="btn-link data-link" style="text-decoration: none">
-                <span class='data-header-cell-content'>{{ column.title }}</span>
+                <span class='data-header-cell-content'>{{ ::column.title }}</span>
                 <i ng-if="column.help" class="fa fa-question-circle"></i>
                 <i class="fa fa-chevron-down" ng-show="sortedBy(column, true)"></i>
                 <i class="fa fa-chevron-up" ng-show="sortedBy(column)"></i>
@@ -102,9 +102,9 @@
             <div class="prefix-container" ng-if="shouldHaveRowPrefix(row)" ng-bind-html="rowPrefix()(row)">
             </div>
         </div>
-        <div class="data-cell flex-columns-{{ ::column.cols }}" ng-repeat="column in getConfig()" data-title="{{ column.title }}" ng-class="getNGClass(column, row)" ng-mouseenter="cellMouseEnter($event)" ng-mouseleave="cellMouseLeave($event)">
+        <div class="data-cell flex-columns-{{ ::column.cols }}" ng-repeat="column in getConfig()" data-title="{{ ::column.title }}" ng-class="getNGClass(column, row)" ng-mouseenter="cellMouseEnter($event)" ng-mouseleave="cellMouseLeave($event)">
             <div ng-if="column.checkbox" class="checkbox">
-                <input type="checkbox" value="{{ row[column.dataField] }}" ng-click="clickAction('{{ row[column.dataField] }}')" id="checkbox_{{ row[column.dataField] }}">
+                <input type="checkbox" value="{{ ::row[column.dataField] }}" ng-click="clickAction('{{ row[column.dataField] }}')" id="checkbox_{{ row[column.dataField] }}">
             </div>
             <div ng-if="column.menu" class="menu-column">
                 <button class="menu-toggle btn-link" ng-click="toggleMenu(row, column)">
@@ -115,7 +115,7 @@
                     <li class="menu-item" ng-repeat="menuItem in column.menu.items">
                         <button class="btn-link" ng-class="menuItem.class" ng-click="executeAction(row, menuItem)">
                             <i ng-if="menuItem.icon" class="fa" ng-class="menuItem.icon"></i>
-                            <span class="menu-item-text">{{ menuItem.text }}</span>
+                            <span class="menu-item-text">{{ ::menuItem.text }}</span>
                         </button>
                     </li>
                 </ul>
@@ -124,20 +124,16 @@
                 <i ng-repeat="icon in iconUnwrap(column, row, 'i')" class="data-table-cell-icon {{ icon.name }}" tooltip="{{ icon.tooltip.text }}" tooltip-append-to-body="true" tooltip-placement="{{ (icon.tooltip.placement) ? icon.tooltip.placement : 'top' }}"></i>
                 <div ng-repeat="icon in iconUnwrap(column, row, 'div')" class="data-table-cell-icon {{ icon.class }}" alt="{{ icon.alt }}" tooltip="{{ icon.tooltip.text }}" tooltip-append-to-body="true" tooltip-placement="{{ (icon.tooltip.placement) ? icon.tooltip.placement : 'top' }}"></div>
                 <span ng-if="buildContent(row, column)" class="data-cell-content" ng-bind-html="buildContent(row, column)"></span>
-                <a ng-if="!buildContent(row, column) && buildLink(row, column) && hasValue(row, column)" href="{{ buildLink(row, column) }}" class="data-cell-content" target="{{ (column.linkTarget) ? column.linkTarget : '_blank' }}">{{ row | ColumnValue:column }}</a>
+                <a ng-if="!buildContent(row, column) && buildLink(row, column) && hasValue(row, column)" href="{{ buildLink(row, column) }}" class="data-cell-content" target="{{ (column.linkTarget) ? column.linkTarget : '_blank' }}">{{ ::row | ColumnValue:column }}</a>
                 <span ng-if="!buildContent(row, column) && !buildLink(row, column) && hasValue(row, column)" class="data-cell-content">
                     <span ng-if="!allowEditing(column,row) && column.dataField != 'score'">{{ row | ColumnValue:column:false }}</span>
-<<<<<<< HEAD
-                    <span ng-if="!allowEditing(column,row) && column.dataField === 'score'" popover-html="scoreTooltipTemplate(row)" popover-title="Prioritization Score" popover-placement="right" popover-trigger="mouseenter">{{ row | ColumnValue:column }}</span>
-=======
-                    <span ng-if="!allowEditing(column,row) && column.dataField === 'score'" popover="{{scoreTooltipTemplate(row)}}" popover-title="Prioritization Score" popover-placement="right" popover-trigger="mouseover">{{ row | ColumnValue:column }}</span>
->>>>>>> fix(rx-data-table): fixing score popup not displaying
+                    <span ng-if="!allowEditing(column,row) && column.dataField === 'score'" popover-html="scoreTooltipTemplate(row)" popover-title="Prioritization Score" popover-placement="right" popover-trigger="mouseover">{{ ::row | ColumnValue:column }}</span>
                     <span ng-if="allowEditing(column,row)" class="data-editable">
                         <span ng-switch="getEditType(column, row)">
-                            <span ng-switch-when="select" class="data-editable-field" editable-select="row[column.dataField]" e-ng-options="o.value as o.text for o in getEditableOptions(column, row)" buttons="no" onbeforesave="updateField(column, row, $data, this)">{{ row | ColumnValue:column }}</span>
+                            <span ng-switch-when="select" class="data-editable-field" editable-select="row[column.dataField]" e-ng-options="o.value as o.text for o in getEditableOptions(column, row)" buttons="no" onbeforesave="updateField(column, row, $data, this)">{{ ::row | ColumnValue:column }}</span>
                             <span ng-switch-when="typeahead" class="data-editable-field" editable-text="row[column.dataField]" e-typeahead="o.value as o.text for o in getEditableOptions(column, row, $viewValue) | filter:$viewValue" e-typeahead-on-select="updateField(column, row, $data, this)" buttons="no" onshow="getEditableOptions(column, row)">{{ row | ColumnValue:column }}</span>
                             <!-- Same as ng-switch-when="text" -->
-                            <span ng-switch-default class="data-editable-field" editable-text="row[column.dataField]" onbeforesave="updateField(column, row, $data, this)">{{ row | ColumnValue:column }}</span>
+                            <span ng-switch-default class="data-editable-field" editable-text="row[column.dataField]" onbeforesave="updateField(column, row, $data, this)">{{ ::row | ColumnValue:column }}</span>
                             <button class="data-table-field-nullable btn-link" ng-if="column.editable.nullable" ng-click="nullField(column, row, this)" title="Remove {{ column.title }} Value">
                                 <i class="fa fa-times fa-lg"></i>
                             </button>
