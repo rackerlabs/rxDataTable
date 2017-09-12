@@ -102,7 +102,7 @@
             <div class="prefix-container" ng-if="shouldHaveRowPrefix(row)" ng-bind-html="rowPrefix()(row)">
             </div>
         </div>
-        <div class="data-cell flex-columns-{{ column.cols }} data-column-{{ $index + 1}} {{ column.class }}" ng-repeat="column in getConfig()" data-title="{{ column.title }}" ng-class="getNGClass(column, row)" ng-mouseenter="cellMouseEnter($event)" ng-mouseleave="cellMouseLeave($event)">
+        <div class="data-cell flex-columns-{{ ::column.cols }}" ng-repeat="column in getConfig()" data-title="{{ column.title }}" ng-class="getNGClass(column, row)" ng-mouseenter="cellMouseEnter($event)" ng-mouseleave="cellMouseLeave($event)">
             <div ng-if="column.checkbox" class="checkbox">
                 <input type="checkbox" value="{{ row[column.dataField] }}" ng-click="clickAction('{{ row[column.dataField] }}')" id="checkbox_{{ row[column.dataField] }}">
             </div>
@@ -127,7 +127,7 @@
                 <a ng-if="!buildContent(row, column) && buildLink(row, column) && hasValue(row, column)" href="{{ buildLink(row, column) }}" class="data-cell-content" target="{{ (column.linkTarget) ? column.linkTarget : '_blank' }}">{{ row | ColumnValue:column }}</a>
                 <span ng-if="!buildContent(row, column) && !buildLink(row, column) && hasValue(row, column)" class="data-cell-content">
                     <span ng-if="!allowEditing(column,row) && column.dataField != 'score'">{{ row | ColumnValue:column:false }}</span>
-                    <span ng-if="!allowEditing(column,row) && column.dataField === 'score'" popover-html-unsafe="{{scoreTooltipTemplate(row)}}" popover-title="Prioritization Score" popover-append-to-body="true" popover-placement="right" popover-trigger="mouseenter">{{ row | ColumnValue:column }}</span>
+                    <span ng-if="!allowEditing(column,row) && column.dataField === 'score'" popover-html="scoreTooltipTemplate(row)" popover-title="Prioritization Score" popover-placement="right" popover-trigger="mouseenter">{{ row | ColumnValue:column }}</span>
                     <span ng-if="allowEditing(column,row)" class="data-editable">
                         <span ng-switch="getEditType(column, row)">
                             <span ng-switch-when="select" class="data-editable-field" editable-select="row[column.dataField]" e-ng-options="o.value as o.text for o in getEditableOptions(column, row)" buttons="no" onbeforesave="updateField(column, row, $data, this)">{{ row | ColumnValue:column }}</span>
@@ -150,8 +150,6 @@
         </div>
     </div>
     <div ng-if="!pagerObject.showAll" class="pagination-container" ng-show="pagerObject.total > 0">
-        <div class="cell"><span ng-if="!pagerObject.showAll">{{(pagerObject.last == 0) ? '0' : pagerObject.first}} - {{pagerObject.last}} of <span class='total-data-items'>{{pagerObject.total}} {{ itemName && itemName || 'Items' }}</span></span></div>
-        <div class="cell"><rx-data-table-paginate page-tracking="pagerObject"></rx-data-table-paginate></div>
-        <div class="cell"><rx-data-table-items-per-page></rx-data-table-items-per-page></div>
+        <div class="cell"><rx-paginate page-tracking="pagerObject"></rx-paginate></div>
     </div>
 </div>
