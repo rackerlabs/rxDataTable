@@ -57,6 +57,6 @@
     "postinstall": "grunt shell:hooks"
   },
   "dependencies": {
-    "phantomjs-prebuilt": "^2.1.15"
+    "phantomjs-prebuilt": "2.1.15"
   }
 }
