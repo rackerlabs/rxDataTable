@@ -55,5 +55,8 @@
   "scripts": {
     "test": "grunt karma:single",
     "postinstall": "grunt shell:hooks"
+  },
+  "dependencies": {
+    "phantomjs-prebuilt": "^2.1.15"
   }
 }
