@@ -76,7 +76,7 @@
         </div>
     </div>
     <div class="data-header">
-        <div class="data-header-cell data-column-{{ ::($index + 1) }} flex-columns-{{ ::column.cols }}" ng-repeat="column in getConfig()" data-title="{{ column.title && column.title || column.dataField }}" ng-class="sortClass(column, $index)" draggable="true"
+        <div class="data-header-cell data-column-{{ ($index + 1) }} flex-columns-{{ column.cols }}" ng-repeat="column in getConfig()" data-title="{{ column.title && column.title || column.dataField }}" ng-class="sortClass(column, $index)" draggable="true"
           ng-click="sort($event, column)" popover="{{ ::column.help.body }}" popover-append-to-body="true" popover-popup-delay="1500" popover-title="{{ ::column.help.title }}" popover-trigger="mouseenter" popover-placement="bottom">
             <span class="checkbox-span" ng-if="column.checkbox && column.checkAll">
                 <input ng-click="checkAll(this)" type="checkbox" id="check_all_checkbox">
