@@ -127,11 +127,11 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
             // Here are the Row Details Things
             scope.showRowDetails = (!_.isUndefined(scope.rowDetails) && _.isFunction(scope.rowDetails()));
             scope.canExpandRow = function (row) {
-                if (scope.showRowDetails && !_.isEmpty(scope.rowDetailsClause)) {
+                if (scope.showRowDetails && !_.isEmpty(scope.rowDetailsClause) && !_.includes(['IssueTrak', 'Servicenow-DP'], row.system)) {
                     return $parse(scope.rowDetailsClause)(row);
                 }
 
-                return scope.showRowDetails;
+                return scope.showRowDetails && !_.includes(['IssueTrak', 'Servicenow-DP'], row.system);
             };
             scope.currentRow = '';
 
