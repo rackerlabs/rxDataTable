@@ -196,7 +196,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
 
             scope.buildContent = function (row, column) {
                 if (_.has(column, 'contentFunction')) {
-                    return _.memoize(column.contentFunction)(row);
+                    return column.contentFunction(row);
                 }
             };
 
