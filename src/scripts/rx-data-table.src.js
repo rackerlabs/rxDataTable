@@ -417,6 +417,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
             });
 
             scope.scoreTooltipTemplate = function (row) {
+                var tempWeight = (row.score.elapsedTime - row.score.slMaxResponseTime) / 600;
                 var template = [
                     row.account_tier || '', //jshint ignore:line
                     row.score.type,
@@ -424,21 +425,24 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                     $filter('rxAge')(moment().subtract(row.score.maxResponseTime, 'seconds'), 2, true) + '.',
                     '<br/>Waiting on Racker for ',
                     $filter('rxAge')(row.score.lastResponseTime, 3, true) + '.',
+                    '<br/><br/>Temporary Weight:',
+                    '((',
+                    row.score.elapsedTime,
+                    ' - ',
+                    row.score.slMaxResponseTime,
+                    ' )/ 600 ) = ',
+                    tempWeight,
                     '<br/><br/>Score: ',
-                    row.score.weight,
-                    ' * ',
-                    row.score.priorityWeight,
+                    tempWeight,
+                    ' + (',
+                    row.score.tier,
                     ' * ',
                     row.score.severityWeight,
-                    ' * (',
-                    row.score.elapsedTime,
-                    '/',
-                    row.score.maxResponseTime,
-                    ') * (',
-                    row.score.elapsedTime,
-                    '/',
-                    row.score.slMaxResponseTime,
-                    ')'
+                    ' * ',
+                    row.score.priorityWeight,
+                    ' * MAX (',
+                    tempWeight,
+                    ' + 2, 1))'
                 ];
                 return template.join(' ');
             };
