@@ -422,7 +422,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                     row.account_tier || '', //jshint ignore:line
                     row.score.type,
                     ' for ticket is ',
-                    $filter('rxAge')(moment().subtract(row.score.maxResponseTime, 'seconds'), 2, true) + '.',
+                    $filter('rxAge')(moment().subtract(row.score.slMaxResponseTime, 'seconds'), 2, true) + '.',
                     '<br/>Waiting on Racker for ',
                     $filter('rxAge')(row.score.lastResponseTime, 3, true) + '.',
                     '<br/><br/>Temporary Weight:',
