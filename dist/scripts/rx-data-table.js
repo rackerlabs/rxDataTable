@@ -417,7 +417,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
             });
 
             scope.scoreTooltipTemplate = function (row) {
-                var tempWeight = (row.score.elapsedTime - row.score.slMaxResponseTime) / 600;
+                var tempWeight = (row.score.elapsedTime - row.score.maxResponseTime) / 600;
                 var template = [
                     row.account_tier || '', //jshint ignore:line
                     row.score.type,
@@ -429,7 +429,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
                     '((',
                     row.score.elapsedTime,
                     ' - ',
-                    row.score.slMaxResponseTime,
+                    row.score.maxResponseTime,
                     ' )/ 600 ) = ',
                     tempWeight,
                     '<br/><br/>Score: ',
