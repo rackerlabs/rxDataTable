@@ -127,7 +127,7 @@ app.directive('rxDataTable', function ($http, $timeout, $document, $filter, $par
             // Here are the Row Details Things
             scope.showRowDetails = (!_.isUndefined(scope.rowDetails) && _.isFunction(scope.rowDetails()));
             scope.canExpandRow = function (row) {
-                if (!_.includes(['IssueTrak', 'ServiceNow-DP', 'ServiceNow-Internal'], row.system)) {
+                if (!_.includes(['IssueTrak', 'ServiceNow-DP', 'ServiceNow-Internal', 'ServiceNow-Global'], row.system)) {
                     if (scope.showRowDetails && !_.isEmpty(scope.rowDetailsClause)) {
                         return $parse(scope.rowDetailsClause)(row);
                     }
